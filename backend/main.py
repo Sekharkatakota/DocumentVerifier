@@ -109,11 +109,43 @@ async def rag_query_pdf_ai(ctx: inngest.Context):
     }
 
 
-app = FastAPI()
+# Initialize FastAPI
+app = FastAPI(
+    title="Document Verifier API",
+    description="RAG-based PDF document verification and question answering",
+    version="1.0.0"
+)
 
-inngest.fast_api.serve(app, inngest_client, functions=[rag_ingest_pdf, rag_query_pdf_ai])
+
+# Root endpoint
+@app.get("/")
+async def home():
+    return {
+        "status": "success",
+        "message": "Document Verifier API is running!",
+        "framework": "FastAPI",
+        "services": ["RAG", "Qdrant", "OpenAI", "Inngest"]
+    }
 
 
+# Health check endpoint
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+        "message": "Backend is running successfully"
+    }
+
+
+# Register Inngest functions
+inngest.fast_api.serve(
+    app,
+    inngest_client,
+    functions=[rag_ingest_pdf, rag_query_pdf_ai]
+)
+
+
+# Local development
 if __name__ == "__main__":
     import uvicorn
 
